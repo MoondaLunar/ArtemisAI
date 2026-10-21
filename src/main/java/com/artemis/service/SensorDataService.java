@@ -37,14 +37,11 @@ public class SensorDataService {
     public SensorReadingResponse ingestReading(SensorReadingRequest request) {
         // Map DTO to Entity
         SensorData data = new SensorData();
-        // Assuming you added sourceDeviceId to the entity or handle it via a separate field
-        // For now, we'll map the acousticPing directly
         data.setAcousticPing(request.getAcousticPing());
         data.setTemperature(request.getTemperature());
         data.setSalinity(request.getSalinity());
         data.setTimestamp(request.getTimestamp());
-        
-        // Note: You may need to add 'sourceDeviceId' to the SensorData entity first
+        data.setSourceDeviceId(request.getSourceDeviceId());
         
         // Pre-analysis: Check for anomalies
         if (request.getTemperature() < -2.0 || request.getTemperature() > 40.0) {
@@ -65,25 +62,31 @@ public class SensorDataService {
         response.setSalinity(saved.getSalinity());
         response.setAcousticPing(saved.getAcousticPing());
         response.setTimestamp(saved.getTimestamp());
-        response.setAnomalySuspected(false); // Placeholder, AI will update this later
+        response.setSourceDeviceId(saved.getSourceDeviceId());
+        // Pre-analysis flag mirrors the ingest-time warnings; the AI layer refines it later
+        boolean anomaly = (saved.getTemperature() < -2.0f || saved.getTemperature() > 40.0f)
+                || (saved.getSalinity() < 0.0f || saved.getSalinity() > 40.0f);
+        response.setAnomalySuspected(anomaly);
         
         return response;
     }
 
     /**
-     * Retrieves the full audit history for a given sensor record using Envers.
+     * Returns the revision numbers recorded by Envers for a given sensor record.
      */
-    public List<Object> getAuditHistory(Long id) {
+    public List<Long> getAuditHistory(Long id) {
         AuditReader reader = AuditReaderFactory.get(entityManager);
-        // Returns a list of revisions (could be custom objects or the entity at that revision)
-        return reader.getRevisions(SensorData.class, id);
+        List<Number> revisions = reader.getRevisions(SensorData.class, id);
+        return revisions.stream().map(Number::longValue).collect(Collectors.toList());
     }
 
     /**
-     * Fetches recent data for AI analysis.
+     * Fetches recent data for AI analysis (most recent first).
      */
     public List<SensorReadingResponse> getRecentReadings(int limit) {
-        List<SensorData> readings = repository.findAll(); // Simplified for demo
+        LocalDateTime end = LocalDateTime.now();
+        LocalDateTime start = end.minusDays(365);
+        List<SensorData> readings = repository.findByTimestampBetweenOrderByTimestampDesc(start, end);
         return readings.stream()
                 .limit(limit)
                 .map(this::mapToResponse)
@@ -97,6 +100,7 @@ public class SensorDataService {
         response.setSalinity(data.getSalinity());
         response.setAcousticPing(data.getAcousticPing());
         response.setTimestamp(data.getTimestamp());
+        response.setSourceDeviceId(data.getSourceDeviceId());
         return response;
     }
 }

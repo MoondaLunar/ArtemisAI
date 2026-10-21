@@ -1,10 +1,12 @@
 ## Artemis: AI-Assisted Development Workflow
 
+A Spring Boot 3 + Hibernate Envers sensor-audit baseline for a wildlife conservation platform, generated with local LLMs (Ollama) and corrected by hand. The raw LLM outputs are kept in `archive/` so the correction is auditable.
+
 ### The Challenge
-Generating boilerplate code for Spring Boot 3 with Hibernate Envers using local LLMs (Ollama).
+Generating boilerplate Spring Boot 3 with Hibernate Envers using local LLMs (Ollama).
 
 ### The Issue
-Raw LLM output contained critical errors:
+Raw LLM output contained critical errors (see `archive/` for the receipts):
 - Hallucinated interfaces (`ReactiveRevisionRepository`)
 - Incorrect validation logic (`@Future` on sensor timestamps)
 - Missing imports and truncated code
@@ -16,4 +18,27 @@ Human-in-the-loop verification:
 3. Refactored into correct package structure (`com.artemis.repository`, `service`, `dto`).
 4. Implemented proper Constructor Injection and Envers integration.
 
-**Result:** A compilable, production-ready baseline with documented error correction.
+### Layout
+```
+pom.xml                    Spring Boot 3.3, Java 17, Envers + H2 + validation
+src/main/java/com/artemis  Application, config, controller, dto, entity, repository, service
+src/main/resources         application.properties (H2 default) + postgres profile
+tools/                     agents.py (CrewAI crew) + mock_data_generator.py (CSV mock data)
+archive/                   raw LLM outputs and working notes (provenance)
+docker-compose.yml         postgres + ollama + backend (builds from Dockerfile)
+```
+
+### Run locally (H2, no external DB)
+```sh
+mvn spring-boot:run
+```
+
+### API
+- `POST /api/sensors` — ingest a reading (validated: temperature −2 to 40 °C, salinity 0–40 PSU, timestamp not in the future)
+- `GET /api/sensors/recent?limit=20` — recent readings, most recent first
+- `GET /api/sensors/{id}/audit` — Envers revision numbers for a record
+
+### Run the full stack
+```sh
+docker compose up --build
+```
