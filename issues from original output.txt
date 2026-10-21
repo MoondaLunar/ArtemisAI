@@ -1,0 +1,3 @@
+I prompted the 32B model with explicit constraints. 
+It followed the jakarta rule, but still hallucinated three nonexistent classes, a typo in an import path, and a wrong property name.
+I had to manually review every line against the Spring Boot 3 documentation.

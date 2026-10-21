@@ -1,0 +1,8 @@
+spring.datasource.url=jdbc:postgresql://localhost:5432/artemis_db
+spring.datasource.username=artemis
+spring.datasource.password=password123
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.format_sql=true
+spring.jpa.properties.org.hibernate.envers.audit_table_suffix=_audit

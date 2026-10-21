@@ -1,0 +1,19 @@
+## Artemis: AI-Assisted Development Workflow
+
+### The Challenge
+Generating boilerplate code for Spring Boot 3 with Hibernate Envers using local LLMs (Ollama).
+
+### The Issue
+Raw LLM output contained critical errors:
+- Hallucinated interfaces (`ReactiveRevisionRepository`)
+- Incorrect validation logic (`@Future` on sensor timestamps)
+- Missing imports and truncated code
+
+### The Solution
+Human-in-the-loop verification:
+1. Generated initial draft with Ollama.
+2. Audited code against Spring Boot 3 documentation.
+3. Refactored into correct package structure (`com.artemis.repository`, `service`, `dto`).
+4. Implemented proper Constructor Injection and Envers integration.
+
+**Result:** A compilable, production-ready baseline with documented error correction.

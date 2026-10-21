@@ -1,0 +1,115 @@
+Here's the Java code for both SensorData.java and WildlifeSighting.java:
+
+1. SensorData.java:
+```java
+package com.artemis.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "sensor_data")
+@Audited
+public class SensorData {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Float temperature;
+    private Float salinity;
+    private String acousticPing;
+
+    public SensorData() {
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Float getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(Float temperature) {
+        this.temperature = temperature;
+    }
+
+    public Float getSalinity() {
+        return salinity;
+    }
+
+    public void setSalinity(Float salinity) {
+        this.salinity = salinity;
+    }
+
+    public String getAcousticPing() {
+        return acousticPing;
+    }
+
+    public void setAcousticPing(String acousticPing) {
+        this.acousticPing = acousticPing;
+    }
+}
+```
+1. WildlifeSighting.java:
+```java
+package com.artemis.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "wildlife_sightings")
+@Audited
+public class WildlifeSighting {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String species;
+    private String location;
+    private LocalDateTime timestamp;
+
+    public WildlifeSighting() {
+    }
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+}
+```
+These two files contain the entity classes for SensorData and WildlifeSighting, following your specified requirements.

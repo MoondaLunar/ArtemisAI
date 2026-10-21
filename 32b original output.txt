@@ -1,0 +1,74 @@
+Here is the implementation based on your requirements:
+
+1. Create `src/main/java/com/artemis/Application.java`:
+```java
+package com.artemis;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa auditing.AuditorAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.auditing.AuditReader;
+import org.springframework.data.auditing.AuditTrailManager;
+import org.springframework.data.auditing.SpringJpaAuditorAware;
+
+@Configuration
+@SpringBootApplication
+@EnableJpaAuditing // Enable JPA Auditing
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    // Bean for AuditorAware to work with Jakarta Persistence
+    @Bean
+    public AuditorAware<String> auditorProvider() {
+        return new SpringJpaAuditorAware();
+    }
+}
+```
+1. Create `src/main/java/com/artemis/config/HibernateEnversConfig.java`:
+```java
+package com.artemis.config;
+
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.auditing.AuditEvent;
+import org.springframework.data.envers.repository.support.EnversRevisionRepositoryFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+
+@Configuration
+public class HibernateEnversConfig {
+
+    @PersistenceUnit(name = "primary")
+    private EntityManagerFactory entityManagerFactory;
+
+    // Envers Revision Repository Factory Bean. No manual configuration needed.
+    @Bean
+    public EnversRevisionRepositoryFactoryBean enversRevisionRepositoryFactoryBean() {
+        return new EnversRevisionRepositoryFactoryBean(entityManagerFactory);
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
+}
+```
+1. Create `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/artemis_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.format-sql=true
+spring.data.envers.active=true
+```
+These three files form the main entry point and configuration for your new project called "Artemis". They meet the specified requirements, including the use of Jakart

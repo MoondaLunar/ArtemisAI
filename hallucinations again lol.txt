@@ -1,0 +1,104 @@
+Here's the implementation for each requested file:
+1. docker-compose.yml:
+```yaml
+version: '3'
+services:
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: artemis_user
+      POSTGRES_PASSWORD: artemis_password
+      POSTGRES_DB: artemis_db
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  ollama:
+    image: ollama/ollama:latest
+    environment:
+      DATABASE_URL: postgres://artemis_user:artemis_password@postgres/artemis_db
+    ports:
+      - "5000:5000"
+
+  spring-boot-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile-spring-boot
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/artemis_db?serverTimezone=UTC
+      SPRING_JPA_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA.show_sql: true
+      DATABASE_URL: postgres://artemis_user:artemis_password@postgres/artemis_db
+    ports:
+      - "8080:8080"
+```
+1. mock\_data\_generator.py:
+```python
+import random
+import string
+from datetime import datetime, timedelta
+
+# Placeholder: Use real-world data ranges and distributions for simulation
+TEMP_MIN = -2  # °C
+TEMP_MAX = 40  # °C
+SALINITY_MIN = 0  # PSU
+SALINITY_MAX = 40  # PSU
+ACOUSTIC_PING_ID_LENGTH = 10
+
+# Constants for generating random data
+SPECIES_LIST = ["dolphin", "whale", "shark", "tuna", "swordfish"]
+LOCATIONS_LIST = ["North Atlantic", "South Pacific", "Indian Ocean"]
+
+def generate_random_species():
+    return random.choice(SPECIES_LIST)
+
+def generate_random_location():
+    return random.choice(LOCATIONS_LIST)
+
+def generate_acoustic_ping_id():
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(ACOUSTIC_PING_ID_LENGTH))
+
+def simulate_data(num_records):
+    for _ in range(num_records):
+        temp = random.uniform(TEMP_MIN, TEMP_MAX)
+        salinity = random.uniform(SALINITY_MIN, SALINITY_MAX)
+        acoustic_ping_id = generate_acoustic_ping_id()
+        species = generate_random_species()
+        location = generate_random_location()
+        timestamp = datetime.now() - timedelta(days=random.randint(0, 365))
+
+        print(f"Temperature: {temp}, Salinity: {salinity}, Acoustic Ping: {acoustic_ping_id}, Species: {species}, Location: {location}, Timestamp: {timestamp}")
+
+if __name__ == "__main__":
+    simulate_data(10)
+```
+1. agents.py:
+```python
+from crewai import Agent
+
+class SensorFusion(Agent):
+    # TODO: Implement sensor data fusion logic
+
+class SpeciesID(Agent):
+    # TODO: Implement species identification logic using Ollama LLM
+
+class MigrationTracker(Agent):
+    # TODO: Implement migration tracking logic
+
+class ThreatDetector(Agent):
+    # TODO: Implement threat detection logic
+
+class ReportGenerator(Agent):
+    # TODO: Implement report generation logic, combining results from other agents
+```
+1. Application.java:
+```java
+package com.artemis;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.auditing.AuditorAware
+```

@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: artemis_user
+      POSTGRES_PASSWORD: artemis_password
+      POSTGRES_DB: artemis_db
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ./ollama-data:/root/.ollama  # Persist models!
+    ports:
+      - "11434:11434"  # Correct Ollama port
+
+  spring-boot-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile-spring-boot
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/artemis_db?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: artemis_user
+      SPRING_DATASOURCE_PASSWORD: artemis_password
+      SPRING_JPA_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_HBM2DDL_AUTO: update
+      OLLAMA_BASE_URL: http://ollama:11434  # Important for Python agents to find Ollama inside Docker!
+    ports:
+      - "8080:8080"
